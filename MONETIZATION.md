@@ -124,7 +124,8 @@ A subscription bought on the web also unlocks Pro in the app (same account).
 3. In the EEA/UK, Google requires a **Google-certified consent platform (CMP)**. The
    built-in banner controls whether ads load at all; for EEA traffic add a certified
    CMP (e.g. Google’s own Privacy & messaging) before enabling ads there.
-4. Add `ads.txt` to `public/` with the line AdSense gives you.
+4. `ads.txt` and the `google-adsense-account` meta tag (site verification) are generated
+   at build time from `VITE_ADSENSE_CLIENT_ID` (see `vite.config.ts`) — nothing to add by hand.
 
 Placements are `<AdSlot placement="progress" | "friends" | "help" />`. The component
 renders nothing unless AdSense is configured, the slot exists, advertising consent was
