@@ -14,7 +14,10 @@ if (!url || !token) {
   console.error('Set VITE_SUPABASE_URL and SUPABASE_ACCESS_TOKEN in .env first.')
   process.exit(1)
 }
-const ref = new URL(url).hostname.split('.')[0]
+// VITE_SUPABASE_URL may be our proxy (api.habbitflows.com), so prefer the explicit ref.
+// The job runs inside Supabase, so it calls the function directly, not via the proxy.
+const ref = process.env.SUPABASE_PROJECT_REF || new URL(url).hostname.split('.')[0]
+const fnBase = `https://${ref}.supabase.co`
 const api = (path, body) =>
   fetch(`https://api.supabase.com/v1/projects/${ref}${path}`, {
     method: 'POST',
@@ -36,7 +39,7 @@ await api('/database/query', {
     select cron.unschedule('homework-retention') where exists (select 1 from cron.job where jobname = 'homework-retention');
     select cron.schedule('homework-retention', '17 * * * *', $job$
       select net.http_post(
-        url := '${url}/functions/v1/homework-retention',
+        url := '${fnBase}/functions/v1/homework-retention',
         headers := jsonb_build_object('Content-Type', 'application/json', 'x-job-secret',
                    (select decrypted_secret from vault.decrypted_secrets where name = 'homework_retention_secret')),
         body := '{}'::jsonb,

@@ -18,7 +18,8 @@ if (!url || !token) {
   console.error('Set VITE_SUPABASE_URL and SUPABASE_ACCESS_TOKEN in .env first.')
   process.exit(1)
 }
-const ref = new URL(url).hostname.split('.')[0]
+// VITE_SUPABASE_URL may be our proxy (api.habbitflows.com), so prefer the explicit ref.
+const ref = process.env.SUPABASE_PROJECT_REF || new URL(url).hostname.split('.')[0]
 
 const args = {}
 for (let i = 2; i < process.argv.length; i += 2) {
